@@ -11,6 +11,6 @@ import javax.jws.soap.SOAPBinding;
 public interface ValidationService {
 
     @WebMethod(operationName = "validateXml")
-    public ValidationResponse validateXml(@WebParam(name = "validationRequest") ValidationRequest validationRequest);
+    public ValidationResponse validateXml(@WebParam(name = "validationRequests") ValidationRequests validationRequests);
 
 }

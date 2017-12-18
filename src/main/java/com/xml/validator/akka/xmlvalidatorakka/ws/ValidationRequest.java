@@ -13,8 +13,6 @@ public class ValidationRequest implements Serializable {
     @XmlElement(required = true)
     private String xsdName;
     @XmlElement(required = true)
-    private String messageId;
-    @XmlElement(required = true)
     private byte[] xsdFile;
     @XmlElement(required = true)
     private byte[] xmlFile;
@@ -26,14 +24,6 @@ public class ValidationRequest implements Serializable {
 
     public void setXsdName(String xsdName) {
         this.xsdName = xsdName;
-    }
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
     }
 
     public byte[] getXsdFile() {

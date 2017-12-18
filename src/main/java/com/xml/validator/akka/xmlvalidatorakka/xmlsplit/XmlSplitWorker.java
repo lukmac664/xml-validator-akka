@@ -8,6 +8,7 @@ import akka.util.Timeout;
 import com.xml.validator.akka.xmlvalidatorakka.FactorialResult;
 import com.xml.validator.akka.xmlvalidatorakka.SchemaValidator;
 import com.xml.validator.akka.xmlvalidatorakka.ws.ValidationRequest;
+import com.xml.validator.akka.xmlvalidatorakka.ws.ValidationRequests;
 import com.xml.validator.akka.xmlvalidatorakka.ws.ValidationResult;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
@@ -44,52 +45,31 @@ public class XmlSplitWorker extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(ValidationRequest.class, n -> {
+                .match(ValidationRequests.class, n -> {
 
-                    CompletableFuture<Object> result =
+/*                    CompletableFuture<Object> result =
                             CompletableFuture.supplyAsync(() -> splitXmlAndValidate(n));
-                                   // .thenApply((result2) -> new FactorialResult("testfdsfs", "ttestst"));
-
-                    pipe(result, getContext().dispatcher()).to(sender());
+                                   // .thenApply((result2) -> new FactorialResult("testfdsfs", "ttestst"));*/
+                    splitXmlAndValidate(n);
+                    //pipe(result, getContext().dispatcher()).to(sender());
 
                 })
                 .build();
     }
 
-    ValidationResult splitXmlAndValidate(ValidationRequest validationRequest) {
+    void splitXmlAndValidate(ValidationRequests validationRequests) {
         //split xml
         // send to validation
         System.out.println("XmlSplit Worker is working!" + "Result for = " + " " + self().path().address() + self().path().name());
         Timeout timeout = new Timeout(Duration.create(20, "seconds"));
 
-       // XmlSchemaCollection xmlSchemaCollection = new XmlSchemaCollection();
-       XmlSchemaCollection schemaCol = new XmlSchemaCollection();
-        XmlSchema schema = schemaCol.read(new StreamSource(new ByteArrayInputStream(validationRequest.getXsdFile())));
-       // schema.getElements().values().forEach(s -> s.);
+        validationRequests
+                .getValidationRequests()
+                .stream()
+                .forEach(vr -> validationWorkerRouter.tell(vr, getSelf()));
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        Document doc;
-        try {
-           doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(validationRequest.getXsdFile()));
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        SchemaTypeSystem sts = null;
-        try {
-            sts = XmlBeans.compileXsd(new XmlObject[] {
-                    XmlObject.Factory.parse(new ByteArrayInputStream(validationRequest.getXsdFile())) }, XmlBeans.getBuiltinTypeSystem(), null);
-        } catch (XmlException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        // send parts in loop
+/*        // send parts in loop
         // gather results from CompletableStages
         // return result
         try {
@@ -102,6 +82,6 @@ public class XmlSplitWorker extends AbstractActor {
         } catch (TimeoutException e) {
             e.printStackTrace();
         }
-        return null;
+        return null;*/
     }
 }
